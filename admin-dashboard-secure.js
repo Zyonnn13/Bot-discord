@@ -22,11 +22,33 @@ app.use(session({
         collectionName: 'admin_sessions'
     }),
     cookie: {
-        secure: false, // true en production avec HTTPS
+        secure: process.env.NODE_ENV === 'production', // HTTPS forcé en production
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 heures
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        sameSite: 'strict' // Protection CSRF
     }
 }));
+
+// Headers de sécurité
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+    next();
+});
+
+// Redirection HTTPS forcée en production
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        if (req.header('x-forwarded-proto') !== 'https') {
+            res.redirect(`https://${req.header('host')}${req.url}`);
+        } else {
+            next();
+        }
+    });
+}
 
 // Middleware
 app.use(express.json());
