@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const path = require('path');
 const { PendingVerification, VerifiedUser, SecurityLog, Stats } = require('./models');
 const logger = require('./logger');
 
@@ -55,9 +56,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Intégrer le dashboard moderne
-const modernDashboard = require('./modern-dashboard');
-app.use('/modern', modernDashboard);
+// Route pour le dashboard moderne
+app.get('/modern', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+});
 
 // Schéma pour les administrateurs
 const adminSchema = new mongoose.Schema({
