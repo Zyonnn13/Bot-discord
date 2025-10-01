@@ -56,9 +56,64 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Route pour le dashboard moderne
-app.get('/modern', (req, res) => {
+// Routes du dashboard moderne
+app.get('/modern', requireAuth, requireRole('viewer'), (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+});
+
+app.get('/modern/login', (req, res) => {
+    if (req.session && req.session.adminId) {
+        return res.redirect('/modern');
+    }
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+// APIs pour le dashboard moderne
+app.get('/api/stats', requireAuth, async (req, res) => {
+    try {
+        const totalUsers = await VerifiedUser.countDocuments();
+        const verifiedUsers = await VerifiedUser.countDocuments();
+        const pendingVerifications = await PendingVerification.countDocuments();
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const dailyVerifications = await VerifiedUser.countDocuments({
+            verifiedAt: { $gte: today }
+        });
+
+        res.json({
+            totalUsers,
+            verifiedUsers,
+            pendingVerifications,
+            dailyVerifications
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+app.get('/api/users/recent', requireAuth, async (req, res) => {
+    try {
+        const users = await VerifiedUser.find()
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .select('username email verifiedAt createdAt');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+app.get('/api/logs/recent', requireAuth, async (req, res) => {
+    try {
+        const logs = await SecurityLog.find()
+            .sort({ timestamp: -1 })
+            .limit(20)
+            .select('action username timestamp details');
+        res.json(logs);
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // Schéma pour les administrateurs
