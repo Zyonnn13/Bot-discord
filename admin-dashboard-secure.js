@@ -6,7 +6,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require('path');
 const { VerifiedUser, SecurityLog, AuthorizedAdmin } = require('./models');
-const logger = require('./logger');
 
 require('dotenv').config();
 
@@ -31,7 +30,7 @@ async function isEmailAuthorized(email) {
     });
     return !!authorized;
   } catch (error) {
-    logger.error('Error checking authorized email', { error: error.message });
+    console.error('Error checking authorized email:', error.message);
     return false;
   }
 }
@@ -124,7 +123,7 @@ app.post('/api/login', async (req, res) => {
     await admin.save();
     return res.json({ success: true, message: 'Connexion réussie', role: admin.role });
   } catch (e) {
-    logger.error('Login error', { error: e.message });
+    console.error('Login error:', e.message);
     return res.status(500).json({ error: 'Erreur serveur' });
   }
 });
@@ -143,7 +142,7 @@ app.post('/api/signup', async (req, res) => {
     await new Admin({ username: firstname.toLowerCase(), email: email.toLowerCase(), password: hashedPassword, role: 'admin', isActive: true }).save();
     return res.json({ success: true, message: 'Compte administrateur créé avec succès ! Vous pouvez maintenant vous connecter.', role: 'admin' });
   } catch (e) {
-    logger.error('Signup error', { error: e.message });
+    console.error('Signup error:', e.message);
     return res.status(500).json({ error: 'Erreur serveur lors de la création du compte' });
   }
 });
@@ -185,7 +184,7 @@ app.get('/api/modern-stats', requireAuth, requireRole('viewer'), async (req, res
     } catch (_) {}
     return res.json({ success: true, stats: { serverMembers: discordStats.serverMembers, onlineMembers: discordStats.onlineMembers, verifiedUsers, dailyVerifications, devices, locations, activities } });
   } catch (e) {
-    logger.error('Stats API error', { error: e.message });
+    console.error('Stats API error:', e.message);
     return res.status(500).json({ success: false, error: 'Erreur serveur' });
   }
 });
@@ -196,7 +195,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  logger.info(`Secure admin dashboard started on port ${PORT}`);
+  console.log(`🔒 Dashboard admin sécurisé accessible sur port ${PORT}`);
   console.log(`🔒 Dashboard admin sécurisé accessible sur: http://localhost:${PORT}`);
 });
 
