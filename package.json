@@ -13,7 +13,8 @@
     "test": "node test-connection.js",
     "backup": "node -e \"require('./backupService').createFullBackup().then(() => process.exit(0))\"",
     "render:build": "npm install",
-    "render:start": "node start.js"
+    "render:start": "node start.js",
+    "pwa:generate-icons": "echo 'Générer les icônes PWA manuellement ou avec un outil en ligne'"
   },
   "keywords": [
     "discord",

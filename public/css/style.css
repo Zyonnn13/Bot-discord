@@ -16,6 +16,84 @@ html{
     font-size: 12pt;
     color: var(--text-color);
     text-align: center;
+
+/* PWA Styles - Mobile optimizations */
+@media (max-width: 480px) {
+    .wrapper {
+        width: 100%;
+        border-radius: 0;
+        height: 100vh;
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .dashboard-container {
+        grid-template-areas: 
+            "header"
+            "main";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    
+    .sidebar {
+        display: none; /* Masquer la sidebar sur mobile */
+    }
+    
+    .dashboard-header {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .header-left h1 {
+        font-size: 1.5rem;
+    }
+    
+    .header-left p {
+        font-size: 0.9rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.8rem;
+    }
+    
+    .charts-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .chart-card, .activities-section {
+        margin: 0;
+    }
+    
+    .activities-section {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+}
+
+/* PWA Installation button styles */
+.install-btn {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 body{
     min-height: 100vh;
