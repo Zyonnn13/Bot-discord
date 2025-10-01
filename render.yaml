@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ynov-discord-bot
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node start.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    # Variables d'environnement à configurer manuellement dans Render :
+    # DISCORD_TOKEN
+    # MONGODB_URI  
+    # GUILD_ID
+    # VERIFIED_ROLE_ID
+    # UNVERIFIED_ROLE_ID
+    # EMAIL_USER
+    # EMAIL_PASS
+    # EMAIL_HOST
+    # EMAIL_PORT
+    # EMAIL_FROM
+    # SESSION_SECRET
+    # MAX_VERIFICATION_ATTEMPTS
+    # VERIFICATION_COOLDOWN_MINUTES

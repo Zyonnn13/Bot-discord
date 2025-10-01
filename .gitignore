@@ -1,0 +1,30 @@
+# Fichiers à ignorer par Git
+node_modules/
+logs/
+backups/
+.env
+.env.local
+.env.production.local
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers temporaires
+*.tmp
+*.log
+*.pid
+
+# Dossiers de build
+dist/
+build/
+
+# Fichiers IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers de sauvegarde
+*.bak
+*~
