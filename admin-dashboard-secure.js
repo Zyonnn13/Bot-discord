@@ -20,6 +20,9 @@ const AUTHORIZED_ADMIN_EMAILS = [
 const app = express();
 const PORT = process.env.ADMIN_PORT || 3000;
 
+// Trust proxy for correct protocol/IP when behind Render's proxy
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'ynov-admin-secret-key-2024',
   resave: false,
@@ -38,6 +41,8 @@ app.use((req, res, next) => {
 });
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
+    // Allow health checks over HTTP without redirect loop
+    if (req.path === '/healthz') return next();
     if (req.header('x-forwarded-proto') !== 'https') return res.redirect(`https://${req.header('host')}${req.url}`);
     return next();
   });
@@ -76,6 +81,11 @@ const requireRole = (minRole) => {
 async function connectIfNeeded() {
   if (mongoose.connection.readyState === 0) await mongoose.connect(process.env.MONGODB_URI);
 }
+
+// Lightweight health endpoint for Render
+app.get('/healthz', (req, res) => {
+  res.type('text/plain').send('ok');
+});
 
 app.get('/dashboard', requireAuth, (req, res) => res.sendFile(path.join(__dirname, 'views', 'dashboard.html')));
 app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'views', 'signup.html')));
