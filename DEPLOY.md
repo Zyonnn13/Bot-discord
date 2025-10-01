@@ -45,17 +45,17 @@
 Dans la section **"Environment"**, ajoutez TOUTES ces variables :
 
 ```env
-DISCORD_TOKEN=MTQyMjI3OTIwMjUzODkxODExMg.GMSmj4.2qzNTzr-KNeItJ8y6ZV7PnifZYPVOyLZNkPPFs
-GUILD_ID=1422220722608017572
-UNVERIFIED_ROLE_ID=1422269296050176200
-VERIFIED_ROLE_ID=1422223896504963173
-MONGODB_URI=mongodb+srv://clementbelmondo_db_user:laLE2FNnOhjtufKX@cluster0.dytwxqk.mongodb.net/ynov-bot?retryWrites=true&w=majority
+DISCORD_TOKEN=votre_token_discord
+GUILD_ID=votre_guild_id
+UNVERIFIED_ROLE_ID=votre_unverified_role_id
+VERIFIED_ROLE_ID=votre_verified_role_id
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER=clementbelmondo@gmail.com
-EMAIL_PASS=orgarjwltxdvrsjn
-EMAIL_FROM=noreply@ynov.com
-SESSION_SECRET=ynov-super-secret-key-2024-secure
+EMAIL_USER=votre_email@gmail.com
+EMAIL_PASS=votre_mot_de_passe_app
+EMAIL_FROM=noreply@votre-domaine.com
+SESSION_SECRET=votre_cle_secrete_session
 MAX_VERIFICATION_ATTEMPTS=3
 VERIFICATION_COOLDOWN_MINUTES=60
 NODE_ENV=production
