@@ -140,6 +140,40 @@ securityLogSchema.index({ timestamp: -1 });
 // Auto-suppression des vérifications expirées (après 24h)
 pendingVerificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
 
+// Schéma pour les emails autorisés à créer des comptes admin
+const authorizedAdminSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true
+    },
+    addedBy: {
+        type: String,
+        required: false // Email de l'admin qui a ajouté cet email
+    },
+    addedAt: {
+        type: Date,
+        default: Date.now
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    notes: {
+        type: String,
+        required: false // Notes optionnelles
+    }
+}, {
+    timestamps: true
+});
+
+// Index pour optimiser les performances
+authorizedAdminSchema.index({ email: 1 });
+authorizedAdminSchema.index({ isActive: 1 });
+
+const AuthorizedAdmin = mongoose.model('AuthorizedAdmin', authorizedAdminSchema);
+
 const PendingVerification = mongoose.model('PendingVerification', pendingVerificationSchema);
 const VerifiedUser = mongoose.model('VerifiedUser', verifiedUserSchema);
 const SecurityLog = mongoose.model('SecurityLog', securityLogSchema);
@@ -149,5 +183,6 @@ module.exports = {
     PendingVerification,
     VerifiedUser,
     SecurityLog,
-    Stats
+    Stats,
+    AuthorizedAdmin
 };

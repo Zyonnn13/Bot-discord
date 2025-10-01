@@ -5,17 +5,36 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require('path');
-const { VerifiedUser, SecurityLog } = require('./models');
+const { VerifiedUser, SecurityLog, AuthorizedAdmin } = require('./models');
 const logger = require('./logger');
 
 require('dotenv').config();
 
-const AUTHORIZED_ADMIN_EMAILS = [
-  'clementbelmondo@gmail.com',
-  'admin@ynov.com',
-  'hugo.paulier@ynov.com',
-  'samuel.berard@ynov.com',
-];
+// Load authorized emails from environment variable (comma-separated) OR fallback to DB
+const AUTHORIZED_ADMIN_EMAILS = process.env.AUTHORIZED_ADMIN_EMAILS 
+  ? process.env.AUTHORIZED_ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase())
+  : null; // Will check database if null
+
+// Function to check if email is authorized (env var or DB)
+async function isEmailAuthorized(email) {
+  // First check environment variable (for backward compatibility)
+  if (AUTHORIZED_ADMIN_EMAILS && AUTHORIZED_ADMIN_EMAILS.includes(email.toLowerCase())) {
+    return true;
+  }
+  
+  // Then check database
+  try {
+    await connectIfNeeded();
+    const authorized = await AuthorizedAdmin.findOne({ 
+      email: email.toLowerCase(), 
+      isActive: true 
+    });
+    return !!authorized;
+  } catch (error) {
+    logger.error('Error checking authorized email', { error: error.message });
+    return false;
+  }
+}
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 3000;
@@ -117,7 +136,7 @@ app.post('/api/signup', async (req, res) => {
     if (!firstname || !email || !password || !repeatPassword) return res.status(400).json({ error: 'Tous les champs sont requis' });
     if (password !== repeatPassword) return res.status(400).json({ error: 'Les mots de passe ne correspondent pas' });
     if (password.length < 6) return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 6 caractères' });
-    if (!AUTHORIZED_ADMIN_EMAILS.includes(email.toLowerCase())) return res.status(403).json({ error: "Adresse email non autorisée. Contactez l'administrateur." });
+    if (!(await isEmailAuthorized(email))) return res.status(403).json({ error: "Adresse email non autorisée. Contactez l'administrateur." });
     if (await Admin.findOne({ $or: [{ email: email.toLowerCase() }, { username: firstname.toLowerCase() }] }))
       return res.status(409).json({ error: "Un compte avec cet email ou nom d'utilisateur existe déjà" });
     const hashedPassword = await bcrypt.hash(password, 12);
