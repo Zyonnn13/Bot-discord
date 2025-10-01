@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Dashboard Ynov Bot</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="login-container">
+        <form class="login-form" action="/admin/login" method="POST" data-ajax>
+            <div class="login-header">
+                <h1>🤖 Ynov Bot</h1>
+                <p>Dashboard d'administration</p>
+            </div>
+            
+            <div id="alerts"></div>
+            
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            
+            <button type="submit" class="btn btn-full" data-original-text="Se connecter">
+                Se connecter
+            </button>
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <small style="color: var(--text-secondary);">
+                    Accès réservé aux administrateurs
+                </small>
+            </div>
+        </form>
+    </div>
+    
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

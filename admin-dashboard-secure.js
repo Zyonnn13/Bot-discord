@@ -55,6 +55,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// Intégrer le dashboard moderne
+const modernDashboard = require('./modern-dashboard');
+app.use('/modern', modernDashboard);
+
 // Schéma pour les administrateurs
 const adminSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },

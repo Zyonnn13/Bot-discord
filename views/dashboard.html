@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Ynov Discord Bot</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div style="width: 40px; height: 40px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🤖</div>
+                    <h1>Ynov Discord Bot</h1>
+                </div>
+                
+                <nav class="nav">
+                    <a href="/admin" class="active">Dashboard</a>
+                    <a href="/admin/users">Utilisateurs</a>
+                    <a href="/admin/logs">Logs</a>
+                    <a href="/admin/settings">Paramètres</a>
+                    <a href="/admin/logout">Déconnexion</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Dashboard Administrateur</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div id="clock" style="text-align: right; color: var(--text-secondary);"></div>
+                    <button id="refresh-data" class="btn btn-secondary">🔄 Actualiser</button>
+                </div>
+            </div>
+            
+            <div id="alerts"></div>
+            
+            <!-- Statistiques principales -->
+            <div class="dashboard-grid">
+                <div class="card stat-card">
+                    <h3>👥 Utilisateurs Total</h3>
+                    <span id="total-users" class="stat-number">0</span>
+                    <span class="stat-label">Membres inscrits</span>
+                </div>
+                
+                <div class="card stat-card">
+                    <h3>✅ Utilisateurs Vérifiés</h3>
+                    <span id="verified-users" class="stat-number">0</span>
+                    <span class="stat-label">Comptes validés</span>
+                </div>
+                
+                <div class="card stat-card">
+                    <h3>⏳ En Attente</h3>
+                    <span id="pending-verifications" class="stat-number">0</span>
+                    <span class="stat-label">Vérifications pending</span>
+                </div>
+                
+                <div class="card stat-card">
+                    <h3>📊 Aujourd'hui</h3>
+                    <span id="daily-verifications" class="stat-number">0</span>
+                    <span class="stat-label">Vérifications du jour</span>
+                </div>
+            </div>
+            
+            <!-- Contenu principal -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 2rem;">
+                <!-- Graphique des vérifications -->
+                <div class="card">
+                    <h3>📈 Vérifications par jour</h3>
+                    <canvas id="verificationsChart" style="max-height: 400px;"></canvas>
+                </div>
+                
+                <!-- Activité récente -->
+                <div class="card">
+                    <h3>🔔 Activité Récente</h3>
+                    <div id="recent-logs" class="loading-indicator">
+                        <div class="loading"></div> Chargement...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Utilisateurs récents -->
+            <div class="card" style="margin-top: 2rem;">
+                <h3>👤 Derniers Utilisateurs</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <input type="text" id="search" placeholder="Rechercher un utilisateur..." class="form-control" style="max-width: 300px;">
+                    <a href="/admin/users" class="btn btn-secondary">Voir tous</a>
+                </div>
+                
+                <div class="table">
+                    <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 1rem; padding: 12px; background: var(--background); font-weight: 600; color: var(--primary-color);">
+                        <div>Nom d'utilisateur</div>
+                        <div>Email</div>
+                        <div>Statut</div>
+                        <div>Actions</div>
+                    </div>
+                    <div id="recent-users" class="loading-indicator">
+                        <div style="padding: 2rem; text-align: center;">
+                            <div class="loading"></div> Chargement des utilisateurs...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions rapides -->
+            <div class="card" style="margin-top: 2rem;">
+                <h3>⚡ Actions Rapides</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <button class="btn btn-success" data-action="backup">
+                        💾 Backup Base de Données
+                    </button>
+                    <button class="btn btn-warning" data-action="clean-logs">
+                        🧹 Nettoyer les Logs
+                    </button>
+                    <button class="btn btn-secondary" data-action="send-announcement">
+                        📢 Envoyer Annonce
+                    </button>
+                    <button class="btn btn-error" data-action="emergency-stop">
+                        🚨 Arrêt d'Urgence
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="search-results" style="position: fixed; top: 100px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-width: 300px; z-index: 1000; display: none;"></div>
+    
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
