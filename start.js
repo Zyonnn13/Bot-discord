@@ -46,14 +46,14 @@ async function startServices() {
     try {
         // Importer et démarrer le bot Discord
         console.log('🤖 Initialisation du bot Discord...');
-        require('./main-mongodb');
+        require('./main-mongodb.js');
         
         // Attendre un peu que le bot se connecte
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Importer et démarrer le dashboard admin sécurisé
         console.log('🔒 Initialisation du dashboard admin...');
-        const { app } = require('./admin-dashboard-secure');
+        const { app } = require('./admin-dashboard-secure.js');
         
         // Le dashboard est déjà configuré pour écouter sur le port
         // Il va se lancer automatiquement
