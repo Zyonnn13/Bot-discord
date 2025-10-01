@@ -56,6 +56,62 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// Schéma pour les administrateurs
+const adminSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { 
+        type: String, 
+        enum: ['admin', 'moderator', 'viewer'], 
+        default: 'viewer' 
+    },
+    discordId: String,
+    lastLogin: Date,
+    createdAt: { type: Date, default: Date.now },
+    isActive: { type: Boolean, default: true }
+});
+
+const Admin = mongoose.model('Admin', adminSchema);
+
+// Middleware d'authentification
+const requireAuth = (req, res, next) => {
+    if (req.session && req.session.adminId) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+};
+
+// Middleware de vérification de rôle
+const requireRole = (minRole) => {
+    const roleHierarchy = { 'viewer': 1, 'moderator': 2, 'admin': 3 };
+    
+    return async (req, res, next) => {
+        if (!req.session.adminId) {
+            return res.redirect('/login');
+        }
+        
+        try {
+            const admin = await Admin.findById(req.session.adminId);
+            if (!admin || !admin.isActive) {
+                req.session.destroy();
+                return res.redirect('/login');
+            }
+            
+            if (roleHierarchy[admin.role] >= roleHierarchy[minRole]) {
+                req.admin = admin;
+                next();
+            } else {
+                res.status(403).send('Accès refusé - Privilèges insuffisants');
+            }
+        } catch (error) {
+            logger.error('Role verification error', { error: error.message });
+            res.status(500).send('Erreur serveur');
+        }
+    };
+};
+
 // Routes du dashboard moderne
 app.get('/modern', requireAuth, requireRole('viewer'), (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
@@ -115,62 +171,6 @@ app.get('/api/logs/recent', requireAuth, async (req, res) => {
         res.status(500).json({ error: 'Erreur serveur' });
     }
 });
-
-// Schéma pour les administrateurs
-const adminSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { 
-        type: String, 
-        enum: ['admin', 'moderator', 'viewer'], 
-        default: 'viewer' 
-    },
-    discordId: String,
-    lastLogin: Date,
-    createdAt: { type: Date, default: Date.now },
-    isActive: { type: Boolean, default: true }
-});
-
-const Admin = mongoose.model('Admin', adminSchema);
-
-// Middleware d'authentification
-const requireAuth = (req, res, next) => {
-    if (req.session && req.session.adminId) {
-        next();
-    } else {
-        res.redirect('/login');
-    }
-};
-
-// Middleware de vérification de rôle
-const requireRole = (minRole) => {
-    const roleHierarchy = { 'viewer': 1, 'moderator': 2, 'admin': 3 };
-    
-    return async (req, res, next) => {
-        if (!req.session.adminId) {
-            return res.redirect('/login');
-        }
-        
-        try {
-            const admin = await Admin.findById(req.session.adminId);
-            if (!admin || !admin.isActive) {
-                req.session.destroy();
-                return res.redirect('/login');
-            }
-            
-            if (roleHierarchy[admin.role] >= roleHierarchy[minRole]) {
-                req.admin = admin;
-                next();
-            } else {
-                res.status(403).send('Accès refusé - Privilèges insuffisants');
-            }
-        } catch (error) {
-            logger.error('Role verification error', { error: error.message });
-            res.status(500).send('Erreur serveur');
-        }
-    };
-};
 
 // Connexion à MongoDB (si pas déjà connecté)
 async function connectIfNeeded() {
