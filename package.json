@@ -1,28 +1,19 @@
 {
-  "name": "ynov-discord-bot",
-  "version": "2.0.0",
-  "description": "Bot Discord avec vérification email @ynov.com - Version Enterprise",
-  "main": "main-mongodb.js",
+  "name": "ynov-discord-dashboard",
+  "version": "3.0.0",
+  "description": "Dashboard PWA pour serveur Discord Ynov avec branding personnalisé",
+  "main": "admin-dashboard-secure.js",
   "scripts": {
-    "start": "node start.js",
-    "dev": "nodemon main-mongodb.js",
-    "admin": "node admin-dashboard.js",
-    "admin-secure": "node admin-dashboard-secure.js",
-    "create-admin": "node create-admin.js",
-    "list-admins": "node create-admin.js list",
-    "test": "node test-connection.js",
-    "backup": "node -e \"require('./backupService').createFullBackup().then(() => process.exit(0))\"",
-    "render:build": "npm install",
-    "render:start": "node start.js",
-    "pwa:generate-icons": "echo 'Générer les icônes PWA manuellement ou avec un outil en ligne'"
+    "start": "node admin-dashboard-secure.js",
+    "dev": "nodemon admin-dashboard-secure.js",
+    "manage-emails": "node manage-authorized-emails.js"
   },
   "keywords": [
     "discord",
-    "bot",
+    "dashboard",
     "ynov",
-    "verification",
-    "mongodb",
-    "enterprise"
+    "pwa",
+    "mongodb"
   ],
   "author": "Ynov",
   "license": "MIT",
@@ -33,10 +24,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
-    "fs": "^0.0.1-security",
-    "mongoose": "^8.18.3",
-    "nodemailer": "^7.0.6",
-    "winston": "^3.18.3"
+    "mongoose": "^8.18.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.0"

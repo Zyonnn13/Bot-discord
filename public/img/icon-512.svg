@@ -1,13 +1,24 @@
-<!-- SVG temporaire pour icon-512.png -->
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    <linearGradient id="ynov-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4c1d95;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <rect width="512" height="512" fill="url(#grad)" rx="64"/>
-  <text x="256" y="300" font-family="Arial, sans-serif" font-size="120" font-weight="bold" text-anchor="middle" fill="white">🤖</text>
-  <text x="256" y="380" font-family="Arial, sans-serif" font-size="42" font-weight="500" text-anchor="middle" fill="white">YNOV BOT</text>
-  <text x="256" y="420" font-family="Arial, sans-serif" font-size="28" font-weight="300" text-anchor="middle" fill="white">Dashboard</text>
+  <rect width="512" height="512" fill="url(#ynov-gradient)" rx="64"/>
+  
+  <!-- YNOV Text -->
+  <text x="256" y="150" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" text-anchor="middle" fill="white">YNOV</text>
+  
+  <!-- Discord Icon -->
+  <circle cx="256" cy="256" r="60" fill="white"/>
+  <circle cx="230" cy="235" r="12" fill="#7c3aed"/>
+  <circle cx="282" cy="235" r="12" fill="#7c3aed"/>
+  <path d="M 210,290 Q 256,310 302,290" stroke="#7c3aed" stroke-width="8" fill="none"/>
+  
+  <!-- AIDE Text -->
+  <text x="256" y="400" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" text-anchor="middle" fill="white">AIDE</text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="24" font-weight="300" text-anchor="middle" fill="rgba(255,255,255,0.8)">Discord Dashboard</text>
 </svg>

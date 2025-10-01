@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: ynov-discord-bot
+    name: ynov-discord-dashboard
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: node start.js
+    startCommand: node admin-dashboard-secure.js
     healthCheckPath: /healthz
     envVars:
       - key: NODE_ENV
@@ -13,14 +13,5 @@ services:
     # DISCORD_TOKEN
     # MONGODB_URI  
     # GUILD_ID
-    # VERIFIED_ROLE_ID
-    # UNVERIFIED_ROLE_ID
-    # EMAIL_USER
-    # EMAIL_PASS
-    # EMAIL_HOST
-    # EMAIL_PORT
-    # EMAIL_FROM
     # SESSION_SECRET
-    # MAX_VERIFICATION_ATTEMPTS
-    # VERIFICATION_COOLDOWN_MINUTES
     # AUTHORIZED_ADMIN_EMAILS (comma-separated: email1@domain.com,email2@domain.com)
