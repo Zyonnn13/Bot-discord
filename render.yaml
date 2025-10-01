@@ -5,11 +5,10 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: node start.js
+    healthCheckPath: /healthz
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
     # Variables d'environnement à configurer manuellement dans Render :
     # DISCORD_TOKEN
     # MONGODB_URI  
