@@ -124,6 +124,56 @@ app.get('/modern/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
+// API de login pour le formulaire HTML
+app.post('/api/login', async (req, res) => {
+    try {
+        await connectIfNeeded();
+        
+        const { email, password } = req.body;
+        
+        // Trouver l'admin par email ou username
+        const admin = await Admin.findOne({ 
+            $or: [
+                { email: email.toLowerCase() },
+                { username: email.toLowerCase() }
+            ],
+            isActive: true 
+        });
+        
+        if (!admin) {
+            logger.warn('Failed login attempt - user not found', { email });
+            return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+        }
+        
+        const isValidPassword = await bcrypt.compare(password, admin.password);
+        
+        if (!isValidPassword) {
+            logger.warn('Failed login attempt - invalid password', { email });
+            return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+        }
+        
+        // Créer la session
+        req.session.adminId = admin._id;
+        req.session.role = admin.role;
+        
+        logger.info('Successful login', { 
+            adminId: admin._id, 
+            role: admin.role,
+            email: admin.email 
+        });
+        
+        res.json({ 
+            success: true, 
+            message: 'Connexion réussie',
+            role: admin.role 
+        });
+        
+    } catch (error) {
+        logger.error('Login error', { error: error.message });
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
 // APIs pour le dashboard moderne
 app.get('/api/stats', requireAuth, async (req, res) => {
     try {
@@ -179,78 +229,23 @@ async function connectIfNeeded() {
     }
 }
 
+// Page d'inscription
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'signup.html'));
+});
+
+// Page dashboard personnalisée (après login)
+app.get('/dashboard', requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+});
+
 // Page de connexion
 app.get('/login', (req, res) => {
     if (req.session && req.session.adminId) {
-        return res.redirect('/');
+        return res.redirect('/dashboard');
     }
     
-    res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Connexion Admin - Bot Ynov</title>
-        <meta charset="UTF-8">
-        <style>
-            body { 
-                font-family: Arial, sans-serif; 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                margin: 0; padding: 0; height: 100vh;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .login-container { 
-                background: white; padding: 40px; border-radius: 15px; 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 400px; width: 100%;
-            }
-            .logo { text-align: center; margin-bottom: 30px; }
-            .logo h1 { color: #667eea; margin: 0; font-size: 2em; }
-            .form-group { margin-bottom: 20px; }
-            label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
-            input[type="text"], input[type="password"] { 
-                width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;
-                font-size: 16px; transition: border-color 0.3s;
-            }
-            input[type="text"]:focus, input[type="password"]:focus {
-                outline: none; border-color: #667eea;
-            }
-            .btn { 
-                width: 100%; padding: 12px; background: #667eea; color: white; 
-                border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
-                cursor: pointer; transition: background 0.3s;
-            }
-            .btn:hover { background: #5a6fd8; }
-            .error { color: #e74c3c; text-align: center; margin-top: 15px; }
-            .info { color: #666; text-align: center; margin-top: 20px; font-size: 14px; }
-        </style>
-    </head>
-    <body>
-        <div class="login-container">
-            <div class="logo">
-                <h1>🎓 Admin Ynov</h1>
-                <p>Dashboard de gestion du bot Discord</p>
-            </div>
-            
-            <form method="POST" action="/login">
-                <div class="form-group">
-                    <label for="username">Nom d'utilisateur :</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Mot de passe :</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                
-                <button type="submit" class="btn">Se connecter</button>
-            </form>
-            
-            <div class="info">
-                🔒 Accès réservé aux modérateurs autorisés
-            </div>
-        </div>
-    </body>
-    </html>
-    `);
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
 // Traitement de la connexion
