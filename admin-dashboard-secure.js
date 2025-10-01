@@ -97,7 +97,19 @@ const requireRole = (minRole) => {
 };
 
 async function connectIfNeeded() {
-  if (mongoose.connection.readyState === 0) await mongoose.connect(process.env.MONGODB_URI);
+  if (mongoose.connection.readyState === 0) {
+    try {
+      console.log('🔄 Connexion à MongoDB...');
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log('✅ Connecté à MongoDB');
+    } catch (error) {
+      console.error('❌ Erreur connexion MongoDB:', error.message);
+      // Ne pas faire crash le serveur, juste logger l'erreur
+      console.log('⚠️ Le serveur continuera sans MongoDB (fonctionnalités limitées)');
+      return false;
+    }
+  }
+  return true;
 }
 
 // Lightweight health endpoint for Render
@@ -194,9 +206,37 @@ app.get('/logout', (req, res) => {
   return res.redirect('/login');
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🔒 Dashboard admin sécurisé accessible sur port ${PORT}`);
-  console.log(`🔒 Dashboard admin sécurisé accessible sur: http://localhost:${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 URL: ${process.env.NODE_ENV === 'production' ? 'https://ynov-discord-bot.onrender.com' : `http://localhost:${PORT}`}`);
+  
+  // Test de connexion MongoDB au démarrage (non bloquant)
+  try {
+    await connectIfNeeded();
+    console.log('🎯 Toutes les fonctionnalités sont disponibles');
+  } catch (error) {
+    console.log('⚠️ Fonctionnalités limitées (pas de MongoDB)');
+  }
+}).on('error', (err) => {
+  console.error('❌ Erreur démarrage serveur:', err.message);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🔄 Arrêt graceful du serveur...');
+  process.exit(0);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection:', reason);
+  // Ne pas crash le serveur pour une rejection
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
 });
 
 module.exports = { app, Admin };
