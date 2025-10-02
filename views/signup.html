@@ -12,12 +12,12 @@
     <meta name="apple-mobile-web-app-title" content="YnovBot">
     
     <!-- PWA Links -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/svg+xml" href="/img/icon-192.svg">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/pwa-mobile.css">
+    <link rel="manifest" href="../public/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="../public/img/icon-192.svg">
+    <link rel="apple-touch-icon" href="../public/img/icon-192.svg">
+
+    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="../public/css/pwa-mobile.css">
 </head>
 <body>
     <div class="wrapper">
@@ -44,14 +44,26 @@
                 <label for="password-input">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm240-200q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/></svg>
                 </label>
-                <input type="password" name="password" id="password-input" placeholder="Password">
+                <div class="password-container">
+                    <input type="password" name="password" id="password-input" placeholder="Password">
+                    <img src="../public/img/oeil-ouvert.png" 
+                         class="toggle-password" 
+                         onclick="togglePassword('password-input')"
+                         alt="Voir le mot de passe">
+                </div>
             </div>
             
             <div>
                 <label for="repeat-password-input">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm240-200q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/></svg>
                 </label>
-                <input type="password" name="repeat-password" id="repeat-password-input" placeholder="Repeat Password">
+                <div class="password-container">
+                    <input type="password" name="repeat-password" id="repeat-password-input" placeholder="Repeat Password">
+                    <img src="../public/img/oeil-ouvert.png" 
+                         class="toggle-password" 
+                         onclick="togglePassword('repeat-password-input')"
+                         alt="Voir le mot de passe">
+                </div>
             </div>
             
             <button type="submit">Sign Up</button>
@@ -65,6 +77,22 @@
     </div>
 
     <script>
+        // Fonction pour basculer la visibilité du mot de passe
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const eyeIcon = input.parentElement.querySelector('.toggle-password');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.src = '../public/img/oeil-fermer.png';
+                eyeIcon.alt = 'Masquer le mot de passe';
+            } else {
+                input.type = 'password';
+                eyeIcon.src = '../public/img/oeil-ouvert.png';
+                eyeIcon.alt = 'Voir le mot de passe';
+            }
+        }
+
         document.querySelector('form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
