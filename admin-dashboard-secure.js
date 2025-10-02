@@ -130,6 +130,7 @@ app.post('/api/login', async (req, res) => {
     if (!admin) return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
     if (!(await bcrypt.compare(password, admin.password))) return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
     req.session.adminId = admin._id;
+    req.session.adminEmail = admin.email; // Stocker l'email dans la session
     req.session.role = admin.role;
     admin.lastLogin = new Date();
     await admin.save();
@@ -198,6 +199,95 @@ app.get('/api/modern-stats', requireAuth, requireRole('viewer'), async (req, res
   } catch (e) {
     console.error('Stats API error:', e.message);
     return res.status(500).json({ success: false, error: 'Erreur serveur' });
+  }
+});
+
+// Routes API pour la gestion des emails autorisés
+app.get('/api/authorized-emails', requireAuth, requireRole('admin'), async (req, res) => {
+  try {
+    await connectIfNeeded();
+    const emails = await AuthorizedAdmin.find({ isActive: true })
+      .sort({ addedAt: -1 })
+      .select('email addedBy addedAt notes');
+    
+    return res.json({ success: true, emails });
+  } catch (error) {
+    console.error('Error fetching authorized emails:', error.message);
+    return res.status(500).json({ error: 'Erreur serveur lors de la récupération des emails' });
+  }
+});
+
+app.post('/api/authorized-emails', requireAuth, requireRole('admin'), async (req, res) => {
+  try {
+    await connectIfNeeded();
+    const { email, notes } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email requis' });
+    }
+    
+    // Vérifier que l'email n'existe pas déjà
+    const existingEmail = await AuthorizedAdmin.findOne({ email: email.toLowerCase() });
+    if (existingEmail) {
+      if (existingEmail.isActive) {
+        return res.status(409).json({ error: 'Cet email est déjà autorisé' });
+      } else {
+        // Réactiver l'email
+        existingEmail.isActive = true;
+        existingEmail.notes = notes || '';
+        existingEmail.addedAt = new Date();
+        await existingEmail.save();
+        
+        return res.json({ 
+          success: true, 
+          message: `Email ${email} réactivé avec succès` 
+        });
+      }
+    }
+    
+    // Créer nouvel email autorisé
+    const newAuthorizedEmail = new AuthorizedAdmin({
+      email: email.toLowerCase(),
+      addedBy: req.session.adminEmail || 'admin', // On peut ajouter l'email de l'admin dans la session
+      notes: notes || '',
+      isActive: true
+    });
+    
+    await newAuthorizedEmail.save();
+    
+    return res.json({ 
+      success: true, 
+      message: `Email ${email} ajouté aux autorisations avec succès` 
+    });
+    
+  } catch (error) {
+    console.error('Error adding authorized email:', error.message);
+    return res.status(500).json({ error: 'Erreur serveur lors de l\'ajout de l\'email' });
+  }
+});
+
+app.delete('/api/authorized-emails/:id', requireAuth, requireRole('admin'), async (req, res) => {
+  try {
+    await connectIfNeeded();
+    const { id } = req.params;
+    
+    const email = await AuthorizedAdmin.findById(id);
+    if (!email) {
+      return res.status(404).json({ error: 'Email non trouvé' });
+    }
+    
+    // Marquer comme inactif au lieu de supprimer
+    email.isActive = false;
+    await email.save();
+    
+    return res.json({ 
+      success: true, 
+      message: `Email ${email.email} supprimé des autorisations` 
+    });
+    
+  } catch (error) {
+    console.error('Error removing authorized email:', error.message);
+    return res.status(500).json({ error: 'Erreur serveur lors de la suppression de l\'email' });
   }
 });
 
