@@ -36,7 +36,7 @@
                 </label>
                 <div class="password-container">
                     <input type="password" name="password" id="password-input" placeholder="Password" required>
-                    <img src="../public/img/oeil-ouvert.png" 
+                    <img src="../public/img/oeil-ouvert.svg" 
                          class="toggle-password" 
                          onclick="togglePassword('password-input')"
                          alt="Voir le mot de passe">
@@ -61,11 +61,11 @@
             
             if (input.type === 'password') {
                 input.type = 'text';
-                eyeIcon.src = '../public/img/oeil-fermer.png';
+                eyeIcon.src = '../public/img/oeil-fermer.svg';
                 eyeIcon.alt = 'Masquer le mot de passe';
             } else {
                 input.type = 'password';
-                eyeIcon.src = '../public/img/oeil-ouvert.png';
+                eyeIcon.src = '../public/img/oeil-ouvert.svg';
                 eyeIcon.alt = 'Voir le mot de passe';
             }
         }
