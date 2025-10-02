@@ -55,6 +55,10 @@
                     <span class="nav-icon">🔒</span>
                     <span class="nav-text">Security</span>
                 </a>
+                <a href="#" class="nav-item" data-section="authorized-emails">
+                    <span class="nav-icon">✉️</span>
+                    <span class="nav-text">Emails Autorisés</span>
+                </a>
                 <a href="#" class="nav-item">
                     <span class="nav-icon">⚙️</span>
                     <span class="nav-text">Settings</span>
@@ -137,6 +141,51 @@
                 </div>
                 <div class="activities-list" id="activities-list">
                     <!-- Activities will be loaded by JS -->
+                </div>
+            </div>
+
+            <!-- Section Gestion des Emails Autorisés -->
+            <div class="section-content" id="authorized-emails-section" style="display: none;">
+                <div class="section-header">
+                    <h2>📧 Gestion des Emails Autorisés</h2>
+                    <p>Gérez les adresses email autorisées à créer des comptes administrateur</p>
+                </div>
+
+                <!-- Formulaire d'ajout d'email -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>➕ Ajouter un Email Autorisé</h3>
+                    </div>
+                    <div class="card-content">
+                        <form id="add-email-form" class="add-email-form">
+                            <div class="form-group">
+                                <label for="new-email">Adresse Email</label>
+                                <input type="email" id="new-email" name="email" placeholder="exemple@domaine.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-notes">Notes (optionnel)</label>
+                                <input type="text" id="email-notes" name="notes" placeholder="Ex: Nouvel administrateur, Équipe support...">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <span>➕ Ajouter Email</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Liste des emails autorisés -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📋 Emails Autorisés Actifs</h3>
+                        <button class="btn btn-secondary" onclick="loadAuthorizedEmails()">
+                            🔄 Actualiser
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div id="authorized-emails-list" class="emails-list">
+                            <!-- Les emails seront chargés dynamiquement -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -299,7 +348,191 @@
         }
 
         // Charger les données au chargement de la page
-        document.addEventListener('DOMContentLoaded', loadDashboardData);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+            setupNavigation();
+            setupEmailManagement();
+        });
+
+        // Configuration de la navigation
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = {
+                'authorized-emails': document.getElementById('authorized-emails-section'),
+                'overview': document.querySelector('.stats-row').parentElement
+            };
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Retirer la classe active de tous les éléments
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // Ajouter la classe active à l'élément cliqué
+                    item.classList.add('active');
+                    
+                    // Gérer l'affichage des sections
+                    const sectionName = item.getAttribute('data-section');
+                    
+                    if (sectionName === 'authorized-emails') {
+                        // Masquer toutes les autres sections
+                        Object.values(sections).forEach(section => {
+                            if (section) section.style.display = 'none';
+                        });
+                        // Afficher la section emails
+                        sections['authorized-emails'].style.display = 'block';
+                        loadAuthorizedEmails();
+                    } else {
+                        // Afficher l'overview et masquer les emails
+                        sections['authorized-emails'].style.display = 'none';
+                        sections['overview'].style.display = 'block';
+                    }
+                });
+            });
+        }
+
+        // Configuration de la gestion des emails
+        function setupEmailManagement() {
+            const form = document.getElementById('add-email-form');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await addAuthorizedEmail();
+                });
+            }
+        }
+
+        // Charger la liste des emails autorisés
+        async function loadAuthorizedEmails() {
+            try {
+                const response = await fetch('/api/authorized-emails');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayAuthorizedEmails(result.emails);
+                } else {
+                    showNotification('Erreur lors du chargement des emails', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de connexion', 'error');
+            }
+        }
+
+        // Afficher la liste des emails autorisés
+        function displayAuthorizedEmails(emails) {
+            const container = document.getElementById('authorized-emails-list');
+            container.innerHTML = '';
+
+            if (emails.length === 0) {
+                container.innerHTML = '<div class="no-emails">Aucun email autorisé trouvé</div>';
+                return;
+            }
+
+            emails.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.className = 'email-item';
+                emailItem.innerHTML = `
+                    <div class="email-info">
+                        <div class="email-address">${email.email}</div>
+                        <div class="email-meta">
+                            <span class="email-date">Ajouté le ${new Date(email.addedAt).toLocaleDateString('fr-FR')}</span>
+                            ${email.notes ? `<span class="email-notes">${email.notes}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="email-actions">
+                        <button class="btn btn-danger btn-small" onclick="removeAuthorizedEmail('${email._id}', '${email.email}')">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                `;
+                container.appendChild(emailItem);
+            });
+        }
+
+        // Ajouter un email autorisé
+        async function addAuthorizedEmail() {
+            const form = document.getElementById('add-email-form');
+            const formData = new FormData(form);
+            const email = formData.get('email');
+            const notes = formData.get('notes');
+
+            try {
+                const response = await fetch('/api/authorized-emails', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, notes })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    form.reset();
+                    loadAuthorizedEmails();
+                } else {
+                    showNotification(result.error || 'Erreur lors de l\'ajout', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de connexion', 'error');
+            }
+        }
+
+        // Supprimer un email autorisé
+        async function removeAuthorizedEmail(emailId, emailAddress) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer l'email "${emailAddress}" ?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/authorized-emails/${emailId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    loadAuthorizedEmails();
+                } else {
+                    showNotification(result.error || 'Erreur lors de la suppression', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de connexion', 'error');
+            }
+        }
+
+        // Afficher une notification
+        function showNotification(message, type = 'info') {
+            // Créer l'élément de notification
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                background: ${type === 'success' ? '#48bb78' : type === 'error' ? '#f56565' : '#667eea'};
+            `;
+
+            document.body.appendChild(notification);
+
+            // Supprimer après 3 secondes
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
 
         // Recharger les données toutes les 30 secondes
         setInterval(loadDashboardData, 30000);

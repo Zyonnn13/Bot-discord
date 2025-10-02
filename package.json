@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node admin-dashboard-secure.js",
     "dev": "nodemon admin-dashboard-secure.js",
-    "manage-emails": "node manage-authorized-emails.js"
+    "manage-emails": "node manage-authorized-emails.js",
+    "init-admin": "node init-admin-email.js",
+    "bot": "node discord-bot.js",
+    "bot:dev": "nodemon discord-bot.js",
+    "start:all": "node start-all.js"
   },
   "keywords": [
     "discord",
