@@ -16,8 +16,8 @@
     <link rel="icon" type="image/svg+xml" href="../public/img/icon-192.svg">
     <link rel="apple-touch-icon" href="../public/img/icon-192.svg">
 
-    <link rel="stylesheet" href="../public/css/style.css">
-    <link rel="stylesheet" href="../public/css/pwa-mobile.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/pwa-mobile.css">
 </head>
 <body>
     <div class="wrapper">
@@ -36,7 +36,7 @@
                 </label>
                 <div class="password-container">
                     <input type="password" name="password" id="password-input" placeholder="Password" required>
-                    <img src="../public/img/oeil-ouvert.svg" 
+                    <img src="/img/oeil-ouvert.svg" 
                          class="toggle-password" 
                          onclick="togglePassword('password-input')"
                          alt="Voir le mot de passe">
@@ -61,11 +61,11 @@
             
             if (input.type === 'password') {
                 input.type = 'text';
-                eyeIcon.src = '../public/img/oeil-fermer.svg';
+                eyeIcon.src = '/img/oeil-fermer.svg';
                 eyeIcon.alt = 'Masquer le mot de passe';
             } else {
                 input.type = 'password';
-                eyeIcon.src = '../public/img/oeil-ouvert.svg';
+                eyeIcon.src = '/img/oeil-ouvert.svg';
                 eyeIcon.alt = 'Voir le mot de passe';
             }
         }

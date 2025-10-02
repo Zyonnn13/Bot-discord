@@ -97,7 +97,7 @@ html{
 }
 body{
     min-height: 100vh;
-    background-image: url('../img/Copilot_20251001_132637.jpg');
+    background-image: url('/img/Copilot_20251001_132637.jpg');
     background-size: cover;
     background-position: right;
     overflow: hidden;
